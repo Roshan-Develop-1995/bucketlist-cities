@@ -1,5 +1,7 @@
 import { Component } from 'react';
+import CardList from './components/card-list/card-list.compnent';
 import './App.css';
+import SearchBox from './components/search-box/search-box.components';
 
 class App extends Component {
 
@@ -38,27 +40,16 @@ class App extends Component {
     const { cities, searchField } = this.state;
     const { onSearchChange } = this;
 
-    const fileteredCities = cities.filter(
+    const filteredCities = cities.filter(
       (city) => {
         return city.cityName.toLowerCase().includes(searchField);
       });
 
     return (
       <div className="App">
-        <input
-          className='search-box'
-          type='search'
-          placeholder='search city'
-          onChange={onSearchChange}
-        />
-        {
-          fileteredCities.map(
-            (city) => {
-              return <div key={city.id}>
-                <h1>{city.cityName}</h1>
-              </div>
-            })
-        }
+        <h1 className='app-title'>City Rolodex</h1>
+        <SearchBox onChangeHandler={onSearchChange} placeholder='search cities' className='cities-search-box'/>
+        <CardList cities={filteredCities} />
       </div>
     );
   }
