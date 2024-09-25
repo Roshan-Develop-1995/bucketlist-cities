@@ -1,58 +1,42 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import CardList from './components/card-list/card-list.compnent';
 import './App.css';
 import SearchBox from './components/search-box/search-box.components';
 
-class App extends Component {
+const App = () => {
 
-  constructor() {
-    super();
-    this.state = {
-      cities: [],
-      searchField: ''
-    }
-  }
+  const [searchField, setSearchField] = useState('');
+  const [cities, setCities] = useState([]);
+  const [filteredCities, setFilteredCities] = useState(cities);
 
-  componentDidMount() {
+  useEffect(() => {
     fetch('http://localhost:8080/v1/cities')
       .then((res) => res.json())
-      .then((list) => this.setState(
-        () => {
-          return { cities: list }
-        },
-        () => {
-          console.log(this.state);
-        }
-      ));
-  }
+      .then((list) => setCities(list));
+  }, [])
 
-  // Optimization - by not rendering extra anonymous function on rendering
-  onSearchChange = (event) => {
-    const searchField = event.target.value.toLowerCase();
-    this.setState(() => {
-      return { searchField };
-    });
-  }
-
-
-  render() {
-    //For readability
-    const { cities, searchField } = this.state;
-    const { onSearchChange } = this;
-
-    const filteredCities = cities.filter(
+  useEffect(() => {
+    const newFilteredCities = cities.filter(
       (city) => {
         return city.cityName.toLowerCase().includes(searchField);
       });
+    setFilteredCities(newFilteredCities);
+  }, [cities, searchField])
 
-    return (
-      <div className="App">
-        <h1 className='app-title'>City Rolodex</h1>
-        <SearchBox onChangeHandler={onSearchChange} placeholder='search cities' className='cities-search-box'/>
-        <CardList cities={filteredCities} />
-      </div>
-    );
+  const onSearchChange = (event) => {
+    const updatedField = event.target.value.toLowerCase();
+    setSearchField(updatedField);
   }
+
+  return (
+    <div className="App">
+      <h1 className='app-title'>City Rolodex</h1>
+      <SearchBox onChangeHandler={onSearchChange}
+        placeholder='search cities'
+        className='cities-search-box' />
+      <CardList cities={filteredCities} />
+    </div>
+  )
 }
 
 export default App;
